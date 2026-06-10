@@ -79,8 +79,12 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- Swagger / OpenAPI: dodawany w Fazie 5 (kontrolery + Swagger),
-		     gdzie dobierzemy i zweryfikujemy wersje springdoc zgodna ze Spring Boot 4. -->
+		<!-- Swagger / OpenAPI (springdoc 3.x zgodny ze Spring Boot 4) -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.0.0</version>
+		</dependency>
 
 		<!-- Testy (Spring Boot 4 rozbija starter-test na osobne moduly) -->
 		<dependency>
@@ -108,9 +112,6 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- TestContainers (testy integracyjne na realnym PostgreSQL): dodawany w Fazie 7,
-		     gdzie dobierzemy poprawne koordynaty modulow dla TestContainers 2.x. -->
 	</dependencies>
 
 	<build>
