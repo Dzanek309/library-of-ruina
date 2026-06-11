@@ -7,6 +7,11 @@ import com.libraryforuina.exception.ResourceNotFoundException;
 import com.libraryforuina.repository.AuthorRepository;
 import com.libraryforuina.repository.BookRepository;
 import com.libraryforuina.repository.CategoryRepository;
+import com.libraryforuina.strategy.BookSearchStrategy;
+import com.libraryforuina.strategy.SearchByAuthor;
+import com.libraryforuina.strategy.SearchByAvailable;
+import com.libraryforuina.strategy.SearchByCategory;
+import com.libraryforuina.strategy.SearchByTitle;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -85,6 +90,20 @@ public class BookService {
             throw new ResourceNotFoundException("Ksiazka o id " + id + " nie istnieje");
         }
         bookRepository.deleteById(id);
+    }
+
+    public List<Book> search(String strategy, String value) {
+        List<Book> all = bookRepository.findAll();
+        BookSearchStrategy searchStrategy = switch (strategy.toLowerCase()) {
+            case "title"     -> new SearchByTitle(value);
+            case "author"    -> new SearchByAuthor(value);
+            case "category"  -> new SearchByCategory(value);
+            case "available" -> new SearchByAvailable();
+            default -> throw new BusinessException(
+                    "Nieznana strategia wyszukiwania: " + strategy
+                    + " (dostepne: title, author, category, available)");
+        };
+        return searchStrategy.search(all);
     }
 
     // --- metody pomocnicze ---
