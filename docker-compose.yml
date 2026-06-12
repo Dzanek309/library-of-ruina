@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -8,8 +6,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-library_db}
       POSTGRES_USER: ${POSTGRES_USER:-libuser}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-libpass}
+    # Host 5433 (nie 5432) — na hoscie port 5432 zajmuje lokalna usluga
+    # PostgreSQL 18, ktora zaslanialaby kontener. Wewnatrz sieci Dockera
+    # aplikacja i tak laczy sie po 'postgres:5432', wiec to tylko mapowanie
+    # hostowe do ewentualnego podgladu (np. psql -h localhost -p 5433).
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

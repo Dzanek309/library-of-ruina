@@ -110,14 +110,124 @@ Interfejs `BookSearchStrategy` + implementacje `SearchByTitle`, `SearchByAuthor`
 
 ## Diagram ERD
 
-<!-- TODO (Faza 8): wstaw obrazek ERD wygenerowany z dbdiagram.io / pgAdmin -->
+Schemat bazy odwzorowuje migracje Flyway V1–V7. Diagram renderuje się
+automatycznie na GitHubie (Mermaid):
 
-## Screeny (do uzupełnienia w Fazie 8)
+```mermaid
+erDiagram
+    users ||--o{ reservations : "sklada"
+    users ||--o{ loans : "wypozycza"
+    categories ||--o{ books : "klasyfikuje"
+    books ||--o{ reservations : "dotyczy"
+    books ||--o{ loans : "dotyczy"
+    books }o--o{ authors : "book_authors (N:M)"
 
-- [ ] Swagger UI z grupami endpointów (Books, Loans, Reservations, ...)
-- [ ] Wywołanie POST + odpowiedź (np. rejestracja, dodanie książki, wypożyczenie)
-- [ ] Raport JaCoCo ≥ 80%
-- [ ] Diagram ERD
-- [ ] `git log --graph --oneline --all` (struktura gałęzi i merge'ów)
-- [ ] Historia Pull Requestów z komentarzami Code Review i statusem "Approved"
-- [ ] Tabele w bazie (psql / pgAdmin)
+    users {
+        bigint id PK
+        varchar username UK
+        varchar email UK
+        varchar password
+        varchar role "USER / ADMIN"
+        timestamp created_at
+    }
+    authors {
+        bigint id PK
+        varchar first_name
+        varchar last_name
+        text bio
+    }
+    categories {
+        bigint id PK
+        varchar name UK
+    }
+    books {
+        bigint id PK
+        varchar title
+        varchar isbn UK
+        int publication_year
+        varchar format "PAPER / EBOOK / AUDIOBOOK"
+        int total_copies
+        int available_copies
+        text description
+        bigint category_id FK
+        varchar dtype "dyskryminator SINGLE_TABLE"
+        int pages "PaperBook"
+        varchar file_format "Ebook"
+        int duration_minutes "Audiobook"
+        varchar narrator "Audiobook"
+    }
+    book_authors {
+        bigint book_id PK_FK
+        bigint author_id PK_FK
+    }
+    reservations {
+        bigint id PK
+        bigint user_id FK
+        bigint book_id FK
+        timestamp reserved_at
+        varchar status "PENDING / CONFIRMED / CANCELLED / COMPLETED"
+    }
+    loans {
+        bigint id PK
+        bigint user_id FK
+        bigint book_id FK
+        timestamp borrowed_at
+        timestamp due_date "liczony polimorficznie z typu ksiazki"
+        timestamp returned_at
+        varchar status "BORROWED / RETURNED / OVERDUE"
+    }
+```
+
+**Relacje:**
+- `users` 1:N `reservations`, `users` 1:N `loans`
+- `categories` 1:N `books` (książka ma jedną kategorię)
+- `books` 1:N `reservations`, `books` 1:N `loans`
+- `books` N:M `authors` (tabela pośrednia `book_authors`)
+- `books` — dziedziczenie **SINGLE_TABLE**: `PaperBook` / `Ebook` / `Audiobook` (kolumna `dtype`)
+
+<details>
+<summary>Wersja tekstowa (gdyby Mermaid się nie wyrenderował)</summary>
+
+```
+┌──────────────┐         ┌──────────────────┐
+│    users     │         │   reservations   │
+├──────────────┤         ├──────────────────┤
+│ PK id        │◄──1:N───│ PK id            │
+│    username  │         │ FK user_id       │
+│    email     │         │ FK book_id ──────┼──┐
+│    password  │         │    reserved_at   │  │
+│    role      │         │    status        │  │
+│    created_at│         └──────────────────┘  │
+└──────┬───────┘                               │
+       │ 1:N                                   │
+       │            ┌──────────────────┐       │
+       └───────────►│      loans       │       │
+                    ├──────────────────┤       │
+                    │ PK id            │       │
+                    │ FK user_id       │       │
+                    │ FK book_id ──────┼───────┤
+                    │    borrowed_at   │       │
+                    │    due_date      │       │
+                    │    returned_at   │       │
+                    │    status        │       │
+                    └──────────────────┘       │
+                                               │
+┌──────────────┐      ┌─────────────────┐      │
+│  categories  │      │      books      │◄─────┘
+├──────────────┤      ├─────────────────┤
+│ PK id        │◄1:N──│ PK id           │
+│    name      │      │ FK category_id  │
+└──────────────┘      │    title        │        ┌──────────────┐
+                      │    isbn         │        │   authors    │
+                      │    format       │        ├──────────────┤
+                      │    total_copies │  N:M   │ PK id        │
+                      │    avail_copies │◄──────►│    first_name│
+                      │    dtype        │        │    last_name │
+                      │    pages        │        │    bio       │
+                      │    file_format  │        └──────────────┘
+                      │    duration_min │       (tabela posrednia
+                      │    narrator     │        book_authors)
+                      └─────────────────┘
+```
+
+</details>
