@@ -55,6 +55,7 @@ public abstract class Book {
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
+    @Builder.Default
     private Set<Author> authors = new HashSet<>();
     public abstract int getLoanPeriodDays();
     public abstract String getFormatInfo();
