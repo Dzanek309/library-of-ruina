@@ -61,4 +61,11 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+
+    public User promoteToAdmin(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+        user.setRole(Role.ADMIN);
+        return userRepository.save(user);
+    }
 }
