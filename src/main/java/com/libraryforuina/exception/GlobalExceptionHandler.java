@@ -2,6 +2,7 @@ package com.libraryforuina.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,6 +31,11 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse("Blad walidacji");
         return build(HttpStatus.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        return build(HttpStatus.FORBIDDEN, "Brak uprawnien do wykonania tej operacji");
     }
 
     @ExceptionHandler(Exception.class)

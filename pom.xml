@@ -112,7 +112,43 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- TestContainers (testy integracyjne na realnym PostgreSQL w kontenerze).
+		     SB4 ciagnie TestContainers w linii 2.x: BOM Spring Boota NIE zarzadza
+		     wersjami modulow org.testcontainers, a same moduly maja nowe artifactId
+		     (testcontainers-junit-jupiter, testcontainers-postgresql). Wersje pinujemy
+		     importem testcontainers-bom (ponizej w <dependencyManagement>), zgodnie
+		     z rdzeniem 2.0.3, ktory spring-boot-testcontainers wciaga przechodnio.
+		     Importy w kodzie (org.testcontainers.junit.jupiter.*,
+		     org.testcontainers.containers.PostgreSQLContainer) pozostaja bez zmian. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers-junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers-postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>2.0.3</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>
