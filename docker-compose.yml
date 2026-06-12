@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: library-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-library_db}
+      POSTGRES_USER: ${POSTGRES_USER:-libuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-libpass}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-libuser} -d ${POSTGRES_DB:-library_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: library-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-library_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-libuser}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-libpass}
+      JWT_SECRET: ${JWT_SECRET:-bardzo-dlugi-sekret-minimum-256-bitow-dla-algorytmu-hs256-zmien-to}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:

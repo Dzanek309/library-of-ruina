@@ -1,0 +1,11 @@
+# Build context — kopiujemy tylko to, co potrzebne do zbudowania obrazu.
+target/
+.git/
+.gitignore
+.idea/
+*.iml
+.env
+README.md
+HELP.md
+*.md
+.vscode/
