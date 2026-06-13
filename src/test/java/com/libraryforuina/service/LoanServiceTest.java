@@ -94,8 +94,6 @@ class LoanServiceTest {
         request.setBookId(10L);
     }
 
-    // ── getAll ────────────────────────────────────────────────────────────────
-
     @Test
     @DisplayName("getAll: returns all loans from repository")
     void getAll_returnsList() {
@@ -106,7 +104,6 @@ class LoanServiceTest {
         assertThat(result).hasSize(1);
     }
 
-    // ── getHistoryByUser ──────────────────────────────────────────────────────
 
     @Test
     @DisplayName("getHistoryByUser: returns loans for given user")
@@ -119,13 +116,12 @@ class LoanServiceTest {
         assertThat(result.get(0).getUser().getId()).isEqualTo(1L);
     }
 
-    // ── borrow ────────────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("borrow: creates loan with BORROWED status and decrements available copies")
     void borrow_success() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(bookRepository.findById(10L)).thenReturn(Optional.of(paperBook));
+        when(bookRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(paperBook));
         when(loanRepository.save(any(Loan.class))).thenReturn(activeLoan);
 
         Loan result = loanService.borrow(request);
@@ -142,7 +138,7 @@ class LoanServiceTest {
     void borrow_dueDatePolymorphic_paperBook() {
         LocalDateTime before = LocalDateTime.now();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(bookRepository.findById(10L)).thenReturn(Optional.of(paperBook));
+        when(bookRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(paperBook));
         when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Loan result = loanService.borrow(request);
@@ -157,7 +153,7 @@ class LoanServiceTest {
         request.setBookId(20L);
         LocalDateTime before = LocalDateTime.now();
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(bookRepository.findById(20L)).thenReturn(Optional.of(ebook));
+        when(bookRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(ebook));
         when(loanRepository.save(any(Loan.class))).thenAnswer(inv -> inv.getArgument(0));
 
         Loan result = loanService.borrow(request);
@@ -170,7 +166,7 @@ class LoanServiceTest {
     void borrow_noAvailableCopies_throws() {
         paperBook.setAvailableCopies(0);
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(bookRepository.findById(10L)).thenReturn(Optional.of(paperBook));
+        when(bookRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(paperBook));
 
         assertThatThrownBy(() -> loanService.borrow(request))
                 .isInstanceOf(BusinessException.class)
@@ -190,18 +186,19 @@ class LoanServiceTest {
     @DisplayName("borrow: throws ResourceNotFoundException when book not found")
     void borrow_bookNotFound_throws() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(bookRepository.findById(10L)).thenReturn(Optional.empty());
+        when(bookRepository.findByIdForUpdate(10L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> loanService.borrow(request))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
-    // ── returnBook ────────────────────────────────────────────────────────────
 
     @Test
     @DisplayName("returnBook: sets status RETURNED, sets returnedAt and increments available copies")
     void returnBook_success() {
         when(loanRepository.findById(100L)).thenReturn(Optional.of(activeLoan));
+        // returnBook pobiera ksiazke z blokada wiersza (FOR UPDATE), nie z loan.getBook()
+        when(bookRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(paperBook));
         when(loanRepository.save(activeLoan)).thenReturn(activeLoan);
 
         Loan result = loanService.returnBook(100L);

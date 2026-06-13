@@ -54,6 +54,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
+                        // Frontend SPA (pliki statyczne serwowane z classpath:/static)
+                        .requestMatchers("/", "/index.html", "/app.js", "/styles.css",
+                                "/favicon.ico", "/assets/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

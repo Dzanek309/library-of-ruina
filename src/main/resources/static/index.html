@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library of Ruina — Indeks Zakazanych Ksiąg</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="emberfield" id="emberfield" aria-hidden="true"></div>
+
+<section id="gate" class="gate">
+    <div class="gate__sigil" aria-hidden="true">
+        <svg viewBox="0 0 100 100" class="sigil">
+            <circle cx="50" cy="50" r="46" class="sigil-ring"/>
+            <circle cx="50" cy="50" r="38" class="sigil-ring sigil-ring--thin"/>
+            <path d="M50 8 L62 38 L92 50 L62 62 L50 92 L38 62 L8 50 L38 38 Z" class="sigil-star"/>
+            <circle cx="50" cy="50" r="6" class="sigil-core"/>
+        </svg>
+    </div>
+    <p class="gate__kicker">Politechnika Krakowska · Anno MMXXVI</p>
+    <h1 class="gate__title">Library<span>of</span>Ruina</h1>
+    <p class="gate__sub">Indeks i Wypożyczalnia Zakazanych Ksiąg</p>
+
+    <div class="gate__panel">
+        <div class="tabs" id="authTabs">
+            <button class="tab tab--active" data-auth="login">Wejdź</button>
+            <button class="tab" data-auth="register">Zostań Czytelnikiem</button>
+        </div>
+
+        <form id="loginForm" class="authform">
+            <label class="field">
+                <span>Imię Czytelnika</span>
+                <input name="username" autocomplete="username" required minlength="3" placeholder="np. bibliotekarz">
+            </label>
+            <label class="field">
+                <span>Pieczęć (hasło)</span>
+                <input name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="••••••">
+            </label>
+            <button type="submit" class="btn btn--seal">Przekrocz Próg</button>
+        </form>
+
+        <form id="registerForm" class="authform hidden">
+            <label class="field">
+                <span>Imię Czytelnika</span>
+                <input name="username" required minlength="3" maxlength="100" placeholder="3–100 znaków">
+            </label>
+            <label class="field">
+                <span>Adres korespondencyjny</span>
+                <input name="email" type="email" required placeholder="czytelnik@biblioteka.pl">
+            </label>
+            <label class="field">
+                <span>Pieczęć (hasło)</span>
+                <input name="password" type="password" required minlength="6" placeholder="min. 6 znaków">
+            </label>
+            <button type="submit" class="btn btn--seal">Złóż Przysięgę</button>
+        </form>
+    </div>
+    <p class="gate__foot">Każda księga ma swój termin. Każdy dług zostaje zapisany.</p>
+</section>
+
+<div id="app" class="app hidden">
+    <header class="topbar">
+        <div class="brand">
+            <svg viewBox="0 0 100 100" class="brand-mark" aria-hidden="true">
+                <path d="M50 8 L62 38 L92 50 L62 62 L50 92 L38 62 L8 50 L38 38 Z"/>
+                <circle cx="50" cy="50" r="5"/>
+            </svg>
+            <span class="brand-name">Library<em>of</em>Ruina</span>
+        </div>
+
+        <nav class="nav" id="nav">
+            <button class="navlink navlink--active" data-view="catalog">Indeks</button>
+            <button class="navlink" data-view="search">Wyrocznia</button>
+            <button class="navlink" data-view="loans">Moje Długi</button>
+            <button class="navlink" data-view="reservations">Rezerwy</button>
+            <button class="navlink navlink--admin hidden" data-view="admin">Skryptorium</button>
+        </nav>
+
+        <div class="usermenu">
+            <span class="userbadge" id="userBadge"></span>
+            <button class="btn btn--ghost" id="logoutBtn">Wyjście</button>
+        </div>
+    </header>
+
+    <main id="view" class="view"></main>
+
+    <footer class="appfoot">
+        <span>Library of Ruina · Spring Boot 4 · Java 25</span>
+        <a href="/swagger-ui.html" target="_blank" rel="noopener">Archiwum API ↗</a>
+    </footer>
+</div>
+
+<div id="modalHost" class="modalhost hidden" aria-hidden="true"></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
