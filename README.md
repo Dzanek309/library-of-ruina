@@ -8,8 +8,8 @@ System zarządzania księgarnią / wypożyczalnią książek - Java 25 + Spring 
 
 | Imię i nazwisko | Rola |
 |---|---|
-| Jan Bil | Student A (Lider) |
-| Mikołaj Kosiorek | Student B (Partner) |
+| Jan Bil | Student A |
+| Mikołaj Kosiorek | Student B |
 
 ## Technologie
 
