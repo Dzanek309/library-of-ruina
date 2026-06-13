@@ -1,23 +1,25 @@
 # 📚 Library-fo-ruina
 
-System zarządzania księgarnią / wypożyczalnią książek — Java 25 + Spring Boot 4.
+System zarządzania księgarnią / wypożyczalnią książek - Java 25 + Spring Boot 4.
+
+![Ekran logowania](docs/screenshots/frontend-login.jpg)
 
 ## Autorzy
 
-| Imię i nazwisko | Nr indeksu | Rola |
-|---|---|---|
-| [Imię Nazwisko A] | [indeks] | Student A (Lider) |
-| [Imię Nazwisko B] | [indeks] | Student B (Partner) |
+| Imię i nazwisko | Rola |
+|---|---|
+| Jan Bil | Student A (Lider) |
+| Mikołaj Kosiorek | Student B (Partner) |
 
 ## Technologie
 
 - Java 25, Spring Boot 4.0.6
 - Spring Security + JWT
 - Hibernate + PostgreSQL
-- Flyway (migracje V1–V7)
+- Flyway (migracje V1-V7)
 - Swagger / OpenAPI 3 (springdoc)
 - JUnit 5 + Mockito + TestContainers
-- JaCoCo (pokrycie ≥ 80%)
+- JaCoCo (pokrycie >= 80%)
 - Docker + Docker Compose, Maven
 
 ## Uruchomienie (Docker)
@@ -32,6 +34,9 @@ docker-compose up --build
 - Aplikacja: http://localhost:8080
 - Swagger UI: http://localhost:8080/swagger-ui.html
 
+Seeder zakłada konto administratora (login: `admin`, hasło: `admin123`) oraz
+przykładowy katalog (3 kategorie, 4 autorów, 5 książek w 3 formatach).
+
 ## Uruchomienie lokalne (wymaga PostgreSQL)
 
 ```bash
@@ -41,9 +46,9 @@ docker-compose up --build
 ## Wzorce i OOP
 
 ### Polimorfizm
-Abstrakcyjna klasa `Book` → `PaperBook`, `Ebook`, `Audiobook`. Każda nadpisuje
-`getLoanPeriodDays()` (14 / 30 / 21 dni) i `getFormatInfo()`. Termin zwrotu
-wypożyczenia liczony jest polimorficznie w `LoanService`.
+Abstrakcyjna klasa `Book` przechodzi w `PaperBook`, `Ebook`, `Audiobook`. Każda
+nadpisuje `getLoanPeriodDays()` (14 / 30 / 21 dni) i `getFormatInfo()`. Termin
+zwrotu wypożyczenia liczony jest polimorficznie w `LoanService`.
 
 ### Wzorzec projektowy: Strategy
 Interfejs `BookSearchStrategy` + implementacje `SearchByTitle`, `SearchByAuthor`,
@@ -65,40 +70,52 @@ Interfejs `BookSearchStrategy` + implementacje `SearchByTitle`, `SearchByAuthor`
 | Podgląd wszystkich rezerwacji/wypożyczeń | ❌ | ✅ |
 | Zarządzanie użytkownikami | ❌ | ✅ |
 
+## Swagger / OpenAPI
+
+Pełna dokumentacja REST API dostępna pod `http://localhost:8080/swagger-ui.html`.
+Endpointy pogrupowane są po zasobach, a operacje ADMIN są wyraźnie oznaczone.
+
+![Swagger UI - przegląd endpointów](docs/screenshots/swagger-ui.jpg)
+
+Każdy endpoint można wykonać bezpośrednio z przeglądarki (po autoryzacji tokenem JWT
+przez przycisk **Authorize**).
+
+![Swagger UI - wykonanie zapytania](docs/screenshots/swagger-execute.jpg)
+
 ## Główne endpointy
 
 ### Auth
-- `POST /api/auth/register` — rejestracja
-- `POST /api/auth/login` — logowanie (zwraca JWT)
+- `POST /api/auth/register` - rejestracja
+- `POST /api/auth/login` - logowanie (zwraca JWT)
 
 ### Books
-- `GET /api/books` — katalog
-- `GET /api/books/{id}` — szczegóły
-- `GET /api/books/search?strategy=...&value=...` — wyszukiwanie (Strategy)
-- `GET /api/books/{id}/format-info` — opis formatu (polimorfizm)
-- `POST /api/books` `PUT /api/books/{id}` `DELETE /api/books/{id}` — ADMIN
+- `GET /api/books` - katalog
+- `GET /api/books/{id}` - szczegóły
+- `GET /api/books/search?strategy=...&value=...` - wyszukiwanie (Strategy)
+- `GET /api/books/{id}/format-info` - opis formatu (polimorfizm)
+- `POST /api/books` `PUT /api/books/{id}` `DELETE /api/books/{id}` - ADMIN
 
 ### Authors
-- `GET /api/authors` — lista autorów
-- `POST /api/authors` `PUT /api/authors/{id}` `DELETE /api/authors/{id}` — ADMIN
+- `GET /api/authors` - lista autorów
+- `POST /api/authors` `PUT /api/authors/{id}` `DELETE /api/authors/{id}` - ADMIN
 
 ### Categories
-- `GET /api/categories` — lista kategorii
-- `POST /api/categories` `PUT /api/categories/{id}` `DELETE /api/categories/{id}` — ADMIN
+- `GET /api/categories` - lista kategorii
+- `POST /api/categories` `PUT /api/categories/{id}` `DELETE /api/categories/{id}` - ADMIN
 
 ### Reservations
 - `GET /api/reservations` (ADMIN), `GET /api/reservations/user/{id}`
-- `POST /api/reservations` — rezerwuj
+- `POST /api/reservations` - rezerwuj
 - `PATCH /api/reservations/{id}/cancel`
 
 ### Loans
-- `POST /api/loans/borrow` — wypożycz
-- `PATCH /api/loans/{id}/return` — zwróć
-- `GET /api/loans/user/{id}/history` — historia
+- `POST /api/loans/borrow` - wypożycz
+- `PATCH /api/loans/{id}/return` - zwróć
+- `GET /api/loans/user/{id}/history` - historia
 
 ### Users (ADMIN)
-- `GET /api/users` — wszyscy użytkownicy
-- `DELETE /api/users/{id}` — usuń użytkownika
+- `GET /api/users` - wszyscy użytkownicy
+- `DELETE /api/users/{id}` - usuń użytkownika
 
 ## Testy
 
@@ -108,10 +125,18 @@ Interfejs `BookSearchStrategy` + implementacje `SearchByTitle`, `SearchByAuthor`
 ./mvnw clean verify        # build padnie jesli pokrycie < 80%
 ```
 
+Pokrycie testami wynosi **95%** (próg wymagany: 80%), raport generowany przez JaCoCo:
+
+![Raport pokrycia JaCoCo](docs/screenshots/jacoco.jpg)
+
 ## Diagram ERD
 
-Schemat bazy odwzorowuje migracje Flyway V1–V7. Diagram renderuje się
-automatycznie na GitHubie (Mermaid):
+Schemat bazy odwzorowuje migracje Flyway V1-V7. Poniższy zrzut pochodzi
+bezpośrednio z bazy PostgreSQL (pgAdmin):
+
+![Diagram ERD bazy danych](docs/screenshots/erd.jpg)
+
+Wersja renderowana automatycznie na GitHubie (Mermaid):
 
 ```mermaid
 erDiagram
@@ -183,51 +208,4 @@ erDiagram
 - `categories` 1:N `books` (książka ma jedną kategorię)
 - `books` 1:N `reservations`, `books` 1:N `loans`
 - `books` N:M `authors` (tabela pośrednia `book_authors`)
-- `books` — dziedziczenie **SINGLE_TABLE**: `PaperBook` / `Ebook` / `Audiobook` (kolumna `dtype`)
-
-<details>
-<summary>Wersja tekstowa (gdyby Mermaid się nie wyrenderował)</summary>
-
-```
-┌──────────────┐         ┌──────────────────┐
-│    users     │         │   reservations   │
-├──────────────┤         ├──────────────────┤
-│ PK id        │◄──1:N───│ PK id            │
-│    username  │         │ FK user_id       │
-│    email     │         │ FK book_id ──────┼──┐
-│    password  │         │    reserved_at   │  │
-│    role      │         │    status        │  │
-│    created_at│         └──────────────────┘  │
-└──────┬───────┘                               │
-       │ 1:N                                   │
-       │            ┌──────────────────┐       │
-       └───────────►│      loans       │       │
-                    ├──────────────────┤       │
-                    │ PK id            │       │
-                    │ FK user_id       │       │
-                    │ FK book_id ──────┼───────┤
-                    │    borrowed_at   │       │
-                    │    due_date      │       │
-                    │    returned_at   │       │
-                    │    status        │       │
-                    └──────────────────┘       │
-                                               │
-┌──────────────┐      ┌─────────────────┐      │
-│  categories  │      │      books      │◄─────┘
-├──────────────┤      ├─────────────────┤
-│ PK id        │◄1:N──│ PK id           │
-│    name      │      │ FK category_id  │
-└──────────────┘      │    title        │        ┌──────────────┐
-                      │    isbn         │        │   authors    │
-                      │    format       │        ├──────────────┤
-                      │    total_copies │  N:M   │ PK id        │
-                      │    avail_copies │◄──────►│    first_name│
-                      │    dtype        │        │    last_name │
-                      │    pages        │        │    bio       │
-                      │    file_format  │        └──────────────┘
-                      │    duration_min │       (tabela posrednia
-                      │    narrator     │        book_authors)
-                      └─────────────────┘
-```
-
-</details>
+- `books` dziedziczenie **SINGLE_TABLE**: `PaperBook` / `Ebook` / `Audiobook` (kolumna `dtype`)
